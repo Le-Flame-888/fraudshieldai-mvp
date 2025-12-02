@@ -1,25 +1,79 @@
-import { LoginForm } from "@/components/auth/login-form"
+"use client";
 
-export default function LoginPage() {
+import { SignInPage, Testimonial } from "@/components/ui/sign-in";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+
+const sampleTestimonials: Testimonial[] = [
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/women/57.jpg",
+    name: "Sarah Chen",
+    handle: "@sarahdigital",
+    text: "Amazing platform! The user experience is seamless and the features are exactly what I needed."
+  },
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/men/64.jpg",
+    name: "Marcus Johnson",
+    handle: "@marcustech",
+    text: "This service has transformed how I work. Clean design, powerful features, and excellent support."
+  },
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "David Martinez",
+    handle: "@davidcreates",
+    text: "I've tried many platforms, but this one stands out. Intuitive, reliable, and genuinely helpful for productivity."
+  },
+];
+
+const SignInPageDemo = () => {
+  const router = useRouter();
+
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const rememberMe = formData.get("rememberMe") === "on";
+
+    await authClient.signIn.email({
+      email,
+      password,
+      rememberMe
+    }, {
+      onSuccess: () => {
+        router.push("/dashboard");
+      },
+      onError: (ctx) => {
+        alert(ctx.error.message);
+      }
+    });
+  };
+
+  const handleGoogleSignIn = () => {
+    console.log("Continue with Google clicked");
+    // Implement Google Sign In if needed
+  };
+
+  const handleResetPassword = () => {
+    alert("Reset Password clicked");
+  }
+
+  const handleCreateAccount = () => {
+    router.push("/register");
+  }
+
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <section className="mb-8 text-center" aria-labelledby="login-heading">
-          <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-4">
-            NextAuth Studio
-          </div>
-          <h1 id="login-heading" className="text-3xl font-bold tracking-tight text-foreground mb-2">
-            Welcome back
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Sign in to your account to continue
-          </p>
-        </section>
-        
-        <div className="bg-card border border-border rounded-lg shadow-sm">
-          <LoginForm />
-        </div>
-      </div>
-    </main>
-  )
-}
+    <div className="bg-background text-foreground">
+      <SignInPage
+        heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
+        testimonials={sampleTestimonials}
+        onSignIn={handleSignIn}
+        onGoogleSignIn={handleGoogleSignIn}
+        onResetPassword={handleResetPassword}
+        onCreateAccount={handleCreateAccount}
+      />
+    </div>
+  );
+};
+
+export default SignInPageDemo;

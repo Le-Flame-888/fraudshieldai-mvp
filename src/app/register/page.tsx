@@ -1,25 +1,74 @@
-import { RegisterForm } from "@/components/auth/register-form";
+"use client";
 
-export default function RegisterPage() {
+import { SignUpPage, Testimonial } from "@/components/ui/sign-up";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+
+const sampleTestimonials: Testimonial[] = [
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/women/57.jpg",
+    name: "Sarah Chen",
+    handle: "@sarahdigital",
+    text: "Amazing platform! The user experience is seamless and the features are exactly what I needed."
+  },
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/men/64.jpg",
+    name: "Marcus Johnson",
+    handle: "@marcustech",
+    text: "This service has transformed how I work. Clean design, powerful features, and excellent support."
+  },
+  {
+    avatarSrc: "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "David Martinez",
+    handle: "@davidcreates",
+    text: "I've tried many platforms, but this one stands out. Intuitive, reliable, and genuinely helpful for productivity."
+  },
+];
+
+const SignUpPageDemo = () => {
+  const router = useRouter();
+
+  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    await authClient.signUp.email({
+      email,
+      password,
+      name,
+    }, {
+      onSuccess: () => {
+        router.push("/dashboard");
+      },
+      onError: (ctx) => {
+        alert(ctx.error.message);
+      },
+    });
+  };
+
+  const handleGoogleSignUp = () => {
+    console.log("Continue with Google clicked");
+    // Implement Google Sign Up if needed
+  };
+
+  const handleSignInClick = () => {
+    router.push("/login");
+  }
+
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <section className="mb-8 text-center" aria-labelledby="register-heading">
-          <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-4">
-            FraudShield AI
-          </div>
-          <h1 id="register-heading" className="text-3xl font-bold tracking-tight text-foreground mb-2">
-            Create your account
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Join FraudShield AI in seconds
-          </p>
-        </section>
-
-        <div className="bg-card border border-border rounded-lg shadow-sm">
-          <RegisterForm />
-        </div>
-      </div>
-    </main>
+    <div className="bg-background text-foreground">
+      <SignUpPage
+        heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
+        testimonials={sampleTestimonials}
+        onSignUp={handleSignUp}
+        onGoogleSignUp={handleGoogleSignUp}
+        onSignInClick={handleSignInClick}
+      />
+    </div>
   );
-}
+};
+
+export default SignUpPageDemo;
